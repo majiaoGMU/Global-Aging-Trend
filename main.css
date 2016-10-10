@@ -1,0 +1,70 @@
+html, body, h1, h2, h3, p, ol, ul, li, a {
+  padding: 0;
+  border: 0;
+  margin: 0;
+  font-size: 100%;
+  font: inherit;
+}
+
+body {
+  position: relative;
+$('[data-spy="scroll"]').each(function () {
+  var $spy = $(this).scrollspy('refresh')
+});
+}
+
+.header img {
+  width: 60px;
+  height: auto;
+  float: left;
+  margin-top: 7px;
+  margin-right: 10px;
+  margin-left: 10px;
+  background-color: white;
+  padding-left: 2px;
+  padding-right: 2px;
+}
+
+
+.main-content h1 {
+  padding-left: 20px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  background-color: #444444;
+  color: #ffffff;
+  text-transform: uppercase;
+  font-weight: bold;
+  text-align: left;
+  font-size: 30px;
+}
+
+
+
+.info {
+  text-align: center;
+  padding: 6px 8px;
+  font: 14px/16px Arial, Helvetica, sans-serif;
+  background: white; background: rgba(255,255,255,0.8);
+  box-shadow: 0 0 15px rgba(0,0,0,0.2);
+  border-radius: 5px;
+}
+
+.info h4 {
+  margin: 0 0 5px; color: #777;
+}
+
+.legend {
+  text-align: left; line-height: 16px; color: #555;
+
+}
+
+.legend i {
+  width: 15.5px; height: 15.5px; float: left; margin-right: 16px; opacity: 1;
+}
+
+#map {
+  position: absolute;
+  height: 100vh;
+  width: 100%;
+  background-color: #252525;
+}
