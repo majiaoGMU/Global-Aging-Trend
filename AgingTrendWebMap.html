@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+
+	<title>Global Aging Trend</title>
+	<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no' /">
+
+	<link rel="shortcut icon" type="image/x-icon" href="icon/Grandparents.jpg" />
+
+	<Link rel="stylesheet" href="main.css">
+	<!-- Leaflet -->
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.1/dist/leaflet.css" />
+	<script src="https://unpkg.com/leaflet@1.0.1/dist/leaflet.js"></script>
+	<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.25.1/mapbox-gl.js'></script>
+	<link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.25.1/mapbox-gl.css' rel='stylesheet' />
+</head>
+<body>
+<div class="main-content">
+	<div class="header">
+		<img src="icon/Grandparents.jpg">
+		<h1>2015 Global Aging Trend</h1>
+	</div>
+	<div id='map'></div>
+
+<script type="text/javascript" src="world_aging_trend2.js"></script>
+
+<script type="text/javascript">
+
+	var mapA = L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/dark-v9/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFqaWFvIiwiYSI6ImNpaHdjZDl2ZjAya2N2NGtvYTF4NzJ3ZjQifQ.r5v9mBtQp9kLvhSNdMoA1w', {
+		maxZoom: 18,
+		attribution: 'Map data &copy; <a href="http://mapbox.com">Mapbox</a>',
+		id: 'mapbox.light'
+	});
+	var bounds = [
+		[48.723729, -81.976289],  // Southwest coordinates
+		[32.392549, -110.309934]  // Northeast coordinates
+	]
+	var map = L.map('map', {
+		center: new L.LatLng(35.791400, -12.259842),
+		zoom: 2,
+		//maxBounds: bounds
+		layers: [mapA]
+	});
+
+	//map.options.maxZoom = 7;
+	map.options.minZoom = 1;
+
+	var geojson = L.geoJson(statesData).addTo(map);
+
+	// control that shows state info on hover
+	var info = L.control();
+
+	info.onAdd = function (map) {
+		this._div = L.DomUtil.create('div', 'info');
+		this.update();
+		return this._div;
+	};
+
+	info.update = function (props) {
+		this._div.innerHTML = '<h4>Population Ages 65 and above (% of total)</h4>' +  (props ?
+			'<b>' + props.country_name + '</b><br />' + props._2015 + '%'
+			: 'Hover over a country');
+	};
+
+	info.addTo(map);
+
+
+	// get color depending on population density value
+	function getColor(d) {
+		return d > 20 ? '#990000' :
+				d > 16  ? '#d7301f' :
+				d > 12  ? '#ef6548' :
+				d > 8  ? '#fc8d59' :
+				d > 4   ? '#fdbb84' :
+				d > 2   ? '#fdd49e' :
+							'#fef0d9';
+	}
+
+	function style(feature) {
+		return {
+			weight: 1.8,
+			opacity: 1,
+			color: 'white',
+			dashArray: '1',
+			fillOpacity: 1,
+			fillColor: getColor(feature.properties._2015)
+		};
+	}
+
+	function highlightFeature(e) {
+		var layer = e.target;
+
+		layer.setStyle({
+			weight: 5,
+			color: '#666',
+			dashArray: '',
+			fillOpacity: 0.7
+		});
+
+		if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+			layer.bringToFront();
+		}
+
+		info.update(layer.feature.properties);
+	}
+
+	var geojson;
+
+	function resetHighlight(e) {
+		geojson.resetStyle(e.target);
+		info.update();
+	}
+
+	function zoomToFeature(e) {
+		map.fitBounds(e.target.getBounds());
+	}
+
+	function onEachFeature(feature, layer) {
+		layer.on({
+			mouseover: highlightFeature,
+			mouseout: resetHighlight,
+			click: zoomToFeature
+		});
+	}
+
+	geojson = L.geoJson(statesData, {
+		style: style,
+		onEachFeature: onEachFeature
+	}).addTo(map);
+
+	map.attributionControl.addAttribution('Aging Data &copy; <a href="http://data.worldbank.org/indicator/SP.POP.65UP.TO.ZS?end=2015&name_desc=true&start=1960">The World Bank</a>');
+
+
+	var legend = L.control({position: 'bottomright'});
+
+	legend.onAdd = function (map) {
+
+		var div = L.DomUtil.create('div', 'info legend'),
+			grades = [1, 2, 4, 8, 12, 16, 20],
+			labels = [],
+			from, to;
+
+		for (var i = 0; i < grades.length; i++) {
+			from = grades[i];
+			legendTextFrom = from + "%";
+			to = grades[i + 1];
+			legendTextTo = to + "%";
+
+			labels.push(
+				'<i style="background:' + getColor(from + 1) + '"></i> ' +
+				legendTextFrom + (to ? '&ndash;' + legendTextTo : '+'));
+		}
+
+		div.innerHTML = labels.join('<br>');
+		return div;
+	};
+
+	legend.addTo(map);
+
+</script>
+</div>
+
+</body>
+</html>
